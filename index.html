@@ -1,1 +1,464 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Instagram Otomatik Paylaşım</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #0b0b0f;
+    color: white;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+.header {
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #999;
+}
+
+.card {
+    background: #15151b;
+    border: 1px solid #292932;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.upload {
+    border: 2px dashed #444;
+    border-radius: 14px;
+    padding: 45px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.upload:hover {
+    border-color: #777;
+    background: #1b1b22;
+}
+
+.upload input {
+    display: none;
+}
+
+.upload-icon {
+    font-size: 42px;
+    margin-bottom: 15px;
+}
+
+.upload p {
+    color: #aaa;
+}
+
+.file-name {
+    margin-top: 15px;
+    color: #7ee787;
+    display: none;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ccc;
+    font-size: 14px;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    background: #0e0e13;
+    color: white;
+    border: 1px solid #34343d;
+    border-radius: 10px;
+    padding: 13px;
+    font-size: 15px;
+    outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #777;
+}
+
+textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 14px 22px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary {
+    background: #ffffff;
+    color: #000;
+    width: 100%;
+}
+
+.primary:hover {
+    background: #ddd;
+}
+
+.status {
+    display: none;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    background: #132217;
+    color: #7ee787;
+}
+
+.schedule-list {
+    margin-top: 20px;
+}
+
+.schedule-item {
+    background: #0e0e13;
+    border: 1px solid #292932;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge {
+    background: #292932;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.footer {
+    text-align: center;
+    color: #666;
+    margin-top: 40px;
+    font-size: 13px;
+}
+
+@media(max-width:700px) {
+    .row {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Instagram Otomatik Paylaşım</h1>
+        <p>Reels ve Story içeriklerini planla ve yönet.</p>
+    </div>
+
+    <div class="card">
+        <h2>📱 Instagram Hesabı</h2>
+
+        <div class="form-group">
+            <label>Instagram Kullanıcı Adı</label>
+            <input
+                type="text"
+                id="instagram"
+                placeholder="@kullaniciadi"
+            >
+        </div>
+
+        <button class="primary" onclick="connectInstagram()">
+            Instagram Hesabını Bağla
+        </button>
+
+        <div id="connectionStatus" class="status">
+            Instagram bağlantısı için Meta API kurulumu gerekiyor.
+        </div>
+    </div>
+
+    <div class="card">
+
+        <h2>🎬 Yeni Paylaşım</h2>
+
+        <div class="upload" onclick="document.getElementById('video').click()">
+
+            <div class="upload-icon">⬆️</div>
+
+            <h3>Video seç</h3>
+
+            <p>
+                Reels videonu yüklemek için tıkla
+            </p>
+
+            <input
+                type="file"
+                id="video"
+                accept="video/*"
+                onchange="showFile()"
+            >
+
+            <div id="fileName" class="file-name"></div>
+
+        </div>
+
+        <br>
+
+        <div class="form-group">
+
+            <label>Paylaşım Türü</label>
+
+            <select id="type">
+
+                <option value="reel">
+                    Instagram Reel
+                </option>
+
+                <option value="story">
+                    Instagram Story
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Açıklama</label>
+
+            <textarea
+                id="caption"
+                placeholder="Paylaşım açıklamasını yaz..."
+            ></textarea>
+
+        </div>
+
+        <div class="row">
+
+            <div class="form-group">
+
+                <label>Paylaşım Tarihi</label>
+
+                <input
+                    type="date"
+                    id="date"
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Paylaşım Saati</label>
+
+                <input
+                    type="time"
+                    id="time"
+                >
+
+            </div>
+
+        </div>
+
+        <button class="primary" onclick="schedulePost()">
+            📅 Paylaşımı Planla
+        </button>
+
+        <div id="status" class="status">
+            Paylaşım başarıyla planlandı.
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>📋 Planlanan Paylaşımlar</h2>
+
+        <div id="scheduleList" class="schedule-list">
+
+            <div style="color:#777;">
+                Henüz planlanmış paylaşım yok.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Instagram Otomatik Paylaşım Paneli
+    </div>
+
+</div>
+
+
+<script>
+
+function showFile() {
+
+    const input = document.getElementById("video");
+    const fileName = document.getElementById("fileName");
+
+    if (input.files.length > 0) {
+
+        fileName.innerText =
+            "Seçilen video: " + input.files[0].name;
+
+        fileName.style.display = "block";
+    }
+}
+
+
+function connectInstagram() {
+
+    const username =
+        document.getElementById("instagram").value;
+
+    const status =
+        document.getElementById("connectionStatus");
+
+    if (!username) {
+
+        alert("Önce Instagram kullanıcı adını gir.");
+
+        return;
+    }
+
+    status.innerText =
+        "Instagram hesabı: " +
+        username +
+        " — API bağlantısı için sonraki aşamaya geçilecek.";
+
+    status.style.display = "block";
+}
+
+
+function schedulePost() {
+
+    const video =
+        document.getElementById("video");
+
+    const type =
+        document.getElementById("type").value;
+
+    const caption =
+        document.getElementById("caption").value;
+
+    const date =
+        document.getElementById("date").value;
+
+    const time =
+        document.getElementById("time").value;
+
+    if (!video.files.length) {
+
+        alert("Lütfen önce bir video seç.");
+
+        return;
+    }
+
+    if (!date || !time) {
+
+        alert("Lütfen tarih ve saat seç.");
+
+        return;
+    }
+
+    const list =
+        document.getElementById("scheduleList");
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "schedule-item";
+
+    item.innerHTML = `
+
+        <div>
+
+            <strong>
+                ${video.files[0].name}
+            </strong>
+
+            <br>
+
+            <small style="color:#888;">
+                ${date} ${time}
+            </small>
+
+        </div>
+
+        <span class="badge">
+            ${type === "reel" ? "REEL" : "STORY"}
+        </span>
+
+    `;
+
+    list.innerHTML = "";
+
+    list.appendChild(item);
+
+    const status =
+        document.getElementById("status");
+
+    status.innerText =
+        "✅ Paylaşım planlandı: " +
+        date +
+        " " +
+        time;
+
+    status.style.display = "block";
+}
+
+</script>
+
+</body>
+</html>
